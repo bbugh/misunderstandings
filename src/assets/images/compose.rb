@@ -1,7 +1,7 @@
 require 'fileutils'
 require "tty-progressbar"
 
-sizes = %w[small big]
+sizes = %w[a-little a-lot]
 actors = %w[i he she they you]
 
 size_permutations = sizes.repeated_permutation(2).to_a
@@ -17,8 +17,8 @@ size_permutations.each do |(left_height, right_height)|
   end
 
   actor_permutations.each do |(left_actor, right_actor)|
-    left_actor_image = left_height == 'big' ? "tl-#{left_actor}-said.png" : "bl-#{left_actor}-said.png"
-    right_actor_image = right_height == 'big' ? "tr-#{right_actor}-read.png" : "br-#{right_actor}-read.png"
+    left_actor_image = left_height == 'a-lot' ? "tl-#{left_actor}-said.png" : "bl-#{left_actor}-said.png"
+    right_actor_image = right_height == 'a-lot' ? "tr-#{right_actor}-read.png" : "br-#{right_actor}-read.png"
 
     unless File.exist?("base/#{left_actor_image}")
       puts "Missing #{left_actor_image}"
@@ -28,9 +28,9 @@ size_permutations.each do |(left_height, right_height)|
       puts "Missing #{right_actor_image}"
     end
 
-    output_image = "#{left_actor}-said-#{left_height}-#{right_actor}-read-#{right_height}.png"
+    output_image = "#{left_actor}-said-#{left_height}-#{right_actor}-read-#{right_height}.avif"
     bar.log output_image
-    `convert base/#{bg_image} base/#{left_actor_image} -gravity northwest -composite base/#{right_actor_image} -gravity northwest -composite meme-#{output_image}`
+    `magick base/#{bg_image} base/#{left_actor_image} -gravity northwest -composite base/#{right_actor_image} -gravity northwest -composite meme-#{output_image}`
 
     bar.advance
   end

@@ -1,5 +1,4 @@
-const images = import.meta.glob('./**/*.(jpeg|jpg|png|webp|gif)', { eager: true })
-console.log(images)
+const images = import.meta.glob('./**/*.(avif|jpeg|jpg|png|webp|gif)', { eager: true })
 
 export function imageUrl(path: string): string {
   const imagePath = './assets/images/' + path
