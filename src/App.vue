@@ -1,7 +1,23 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 
 import { imageUrl } from '@/utils'
+
+interface Data {
+  lsu: string
+  lsi: string
+  rsu: string
+  rsi: string
+}
+
+console.log(atob(getItem('b64', '')))
+
+function getItem<T>(key: keyof Data, defaultValue: T) {
+  // get item from query string
+  const queryParams = new URLSearchParams(window.location.search)
+  const queryValue = queryParams.get(key)
+  return (queryValue || defaultValue) as T
+}
 
 const sizes = ['small', 'big'] as const
 const subjects = ['i', 'you', 'he', 'she', 'they'] as const
@@ -9,16 +25,48 @@ const subjects = ['i', 'you', 'he', 'she', 'they'] as const
 type Size = (typeof sizes)[number]
 type Subject = (typeof subjects)[number]
 
-const leftBookSubject = ref<Subject>('you')
-const leftBookSize = ref<Size>('small')
+const leftBookSubject = ref<Subject>(getItem<Subject>('lsu', 'you'))
+const leftBookSize = ref<Size>(getItem<Size>('lsi', 'small'))
 
-const rightBookSubject = ref<Subject>('i')
-const rightBookSize = ref<Size>('big')
+const rightBookSubject = ref<Subject>(getItem<Subject>('rsu', 'i'))
+const rightBookSize = ref<Size>(getItem<Size>('rsi', 'big'))
 
 const bookId = computed(
   () =>
     `meme-${leftBookSubject.value}-said-${leftBookSize.value}-${rightBookSubject.value}-read-${rightBookSize.value}`
 )
+
+watchEffect(() => {
+  // localStorage.setItem(
+  //   'data',
+  //   JSON.stringify({
+  //     leftBookSubject: leftBookSubject.value,
+  //     leftBookSize: leftBookSize.value,
+  //     rightBookSubject: rightBookSubject.value,
+  //     rightBookSize: rightBookSize.value
+  //   })
+  // )
+  // set the query string
+  const queryParams = new URLSearchParams(window.location.search)
+  queryParams.set('lsu', leftBookSubject.value)
+  queryParams.set('lsi', leftBookSize.value)
+  queryParams.set('rsu', rightBookSubject.value)
+  queryParams.set('rsi', rightBookSize.value)
+  queryParams.set(
+    'b64',
+    btoa(
+      JSON.stringify([
+        leftBookSubject.value,
+        leftBookSize.value,
+        rightBookSubject.value,
+        rightBookSize.value
+      ])
+    )
+  )
+  queryParams.set('meme', bookId.value.replace('meme-', ''))
+  const newUrl = `${window.location.pathname}?${queryParams.toString()}`
+  window.history.replaceState(null, '', newUrl)
+})
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 </script>
