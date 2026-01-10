@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { imageUrl } from '@/utils'
 
@@ -29,7 +29,7 @@ const bookId = computed(
     `meme-${leftBookSubject.value}-said-${leftBookSize.value}-${rightBookSubject.value}-read-${rightBookSize.value}`
 )
 
-watchEffect(() => {
+watch([leftBookSubject, leftBookSize, rightBookSubject, rightBookSize], () => {
   const meme = `${leftBookSubject.value}-said-${leftBookSize.value}-${rightBookSubject.value}-read-${rightBookSize.value}`
   const newUrl = `${window.location.pathname}?v=${meme}`
   window.history.replaceState(null, '', newUrl)
